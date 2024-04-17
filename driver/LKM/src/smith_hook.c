@@ -523,30 +523,17 @@ static inline int smith_is_exe_trusted(struct smith_img *img)
                                img->si_murmur64);
 }
 
-/*
- * wrapper for ktime_get_real_seconds
- */
-
 uint64_t (*smith_ktime_get_real_ns)(void);
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0)
-#define smith_get_seconds ktime_get_real_seconds
-#else /* < 5.11.0 */
-static uint64_t (*smith_ktime_get_real_seconds)(void);
-static uint64_t smith_get_seconds(void)
+/*
+ * wrapper for ktime_get_boottime
+ */
+#include <linux/jiffies.h>
+static uint32_t smith_get_seconds(void)
 {
-    return smith_ktime_get_real_seconds();
+    u64 s = jiffies_64_to_clock_t(get_jiffies_64());
+    return (uint32_t)(s);
 }
-static uint64_t smith_get_seconds_ext(void)
-{
-    return (uint64_t)get_seconds();
-}
-static void smith_init_get_seconds(void)
-{
-    if (!smith_ktime_get_real_seconds)
-        smith_ktime_get_real_seconds = smith_get_seconds_ext;
-}
-#endif /* >= 5.11.0 */
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 39)
 void (*__smith_put_task_struct)(struct task_struct *tsk);
@@ -648,14 +635,6 @@ static int __init kernel_symbols_init(void)
     if (!ptr)
         return -ENODEV;
     smith_ktime_get_real_ns = ptr;
-
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0)
-    ptr = (void *)smith_kallsyms_lookup_name("ktime_get_real_seconds");
-    if (ptr)
-        smith_ktime_get_real_seconds = ptr;
-    smith_init_get_seconds();
-#endif
-
 
 /*
  * prepend_path will throw a WARN for d_absolute_path if root
