@@ -6549,16 +6549,20 @@ module_param_call(mem_stats, drvstats_set_params, drvstats_get_params, &g_drv_st
 MODULE_PARM_DESC(worker_stats, "kernel worker threads for elkeid");
 MODULE_PARM_DESC(mem_stats, "memory usage of core objects of elkeid");
 
+/* latest commit id */
+static const char *smith_commit_id = "70c859004700ead3618b30f235dca9e52cb734b3";
+
 static int __init kprobe_hook_init(void)
 {
     int ret;
 
 #if defined(MODULE)
-    printk(KERN_INFO "[ELKEID] kmod %s (%s) loaded.\n",
-           THIS_MODULE->name, THIS_MODULE->version);
+    printk(KERN_INFO "[ELKEID] kmod: %s (%s / %s) loaded\n",
+           THIS_MODULE->name, THIS_MODULE->version, THIS_MODULE->srcversion);
 #else
     printk(KERN_INFO "[ELKEID] intree (" SMITH_VERSION ") loaded.\n");
 #endif
+    printk(KERN_INFO "[ELKEID] logid: %s\n", smith_commit_id);
 
     ret = kernel_symbols_init();
     if (ret)
