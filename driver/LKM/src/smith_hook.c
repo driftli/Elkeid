@@ -6550,7 +6550,7 @@ MODULE_PARM_DESC(worker_stats, "kernel worker threads for elkeid");
 MODULE_PARM_DESC(mem_stats, "memory usage of core objects of elkeid");
 
 /* latest commit id */
-static const char *smith_commit_id = "70c859004700ead3618b30f235dca9e52cb734b3";
+static const char *smith_commit_id = "ae8e31748700eef5ce7377002ff19e0935c9608e";
 
 static int __init kprobe_hook_init(void)
 {
